@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090d14">
+  <title>Sort Lab — Sorting Algorithms</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Sort Lab home">
+        <span class="brand-mark">S</span>
+        <span>SORT<span class="brand-light">LAB</span></span>
+      </a>
+      <div class="topbar-note"><span class="live-dot"></span> ALGORITHM WORKBENCH</div>
+      <div class="topbar-right"><span class="status-label">LOCAL SESSION</span><span class="status-dot"></span></div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow">SORTING ALGORITHMS / VISUAL EXPLORER</div>
+        <h1>See how order <span>takes shape.</span></h1>
+        <p>Run, inspect, and compare classic sorting algorithms one operation at a time.</p>
+      </section>
+
+      <nav class="tabs" aria-label="Main sections">
+        <button class="tab active" data-tab="visualizer"><span class="tab-icon">▥</span> Sorting Visualizer</button>
+        <button class="tab" data-tab="benchmark"><span class="tab-icon">↗</span> Benchmark</button>
+      </nav>
+
+      <section class="tab-panel active" id="visualizer-panel">
+        <div class="workspace">
+          <aside class="control-panel panel">
+            <div class="section-heading"><span class="section-index">01</span><h2>Configure</h2></div>
+            <label class="field-label" for="algorithm">ALGORITHM</label>
+            <select id="algorithm" class="input"></select>
+            <p class="complexity" id="complexity">Loading algorithm details…</p>
+
+            <div class="divider"></div>
+            <label class="field-label" for="data-mode">INPUT DATA</label>
+            <select id="data-mode" class="input">
+              <option value="random">Random values</option>
+              <option value="sorted">Already sorted</option>
+              <option value="reversed">Reverse order</option>
+              <option value="custom">Custom values</option>
+            </select>
+            <label class="field-label field-spaced" for="array-length">ARRAY LENGTH</label>
+            <div class="input-with-suffix">
+              <input id="array-length" class="input" type="number" min="1" step="1" value="128">
+              <span>ITEMS</span>
+            </div>
+            <div id="custom-wrap" class="custom-wrap hidden">
+              <label class="field-label" for="custom-values">VALUES <span>comma or space separated</span></label>
+              <textarea id="custom-values" class="input custom-values" rows="3" placeholder="8, 3, 6, 1, 9"></textarea>
+            </div>
+            <button id="new-data" class="button button-secondary full-width">↻ &nbsp; Generate array</button>
+            <button id="run-sort" class="button button-primary full-width">Run sort <span>→</span></button>
+
+            <div class="divider"></div>
+            <div class="section-heading compact"><span class="section-index">02</span><h2>Playback</h2></div>
+            <label class="field-label" for="speed">STEPS PER SECOND</label>
+            <div class="speed-row">
+              <input id="speed" type="range" min="1" max="120" value="30">
+              <input id="speed-value" class="speed-number" type="number" min="1" step="1" value="30" aria-label="Playback steps per second" title="Type a rate above the slider limit to go faster">
+            </div>
+
+            <div class="sound-row">
+              <label class="sound-toggle" for="sound-enabled">
+                <input id="sound-enabled" type="checkbox" checked>
+                <span class="sound-note" aria-hidden="true">♪</span>
+                <span>Sound</span>
+              </label>
+              <span class="sound-hint">PITCH FOLLOWS VALUE</span>
+            </div>            <div class="transport">
+              <button id="restart" class="icon-button" title="Restart from the beginning" aria-label="Restart">↺</button>
+              <button id="previous" class="icon-button" title="Previous step" aria-label="Previous step">‹</button>
+              <button id="play" class="button button-play" title="Play or pause">▶ Play</button>
+              <button id="next" class="icon-button" title="Next step" aria-label="Next step">›</button>
+            </div>
+            <div id="sort-status" class="status-message">Create an array, then run a sort.</div>
+          </aside>
+
+          <section class="visual-column">
+            <div class="canvas-panel panel">
+              <div class="canvas-header">
+                <div>
+                  <div class="section-index">LIVE ARRAY</div>
+                  <h2 id="canvas-title">Ready to sort</h2>
+                </div>
+                <div class="canvas-meta"><span class="live-dot"></span><span id="array-count">128 ITEMS</span></div>
+              </div>
+              <div class="canvas-wrap"><canvas id="sort-canvas" aria-label="Sorting visualization"></canvas>
+                <div id="empty-state" class="empty-state hidden">Generate an array to start the visualization.</div>
+              </div>
+              <div class="timeline">
+                <div class="timeline-labels"><span>PLAYBACK POSITION</span><span id="step-label">Step 0 of 0</span></div>
+                <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Seek through sorting steps">
+                <div class="timeline-bottom"><span>START</span><span id="step-description">Generate an array to begin.</span><span>FINISH</span></div>
+              </div>
+            </div>
+
+            <div class="metrics-grid">
+              <article class="metric panel"><div class="metric-label">COMPARISONS</div><div id="metric-comparisons" class="metric-value">—</div><div class="metric-foot">element checks</div></article>
+              <article class="metric panel"><div class="metric-label">SWAPS</div><div id="metric-swaps" class="metric-value">—</div><div class="metric-foot">position exchanges</div></article>
+              <article class="metric panel"><div class="metric-label">ARRAY WRITES</div><div id="metric-writes" class="metric-value">—</div><div class="metric-foot">values written</div></article>
+              <article class="metric panel accent-metric"><div class="metric-label">SORT TIME</div><div id="metric-time" class="metric-value">—</div><div class="metric-foot">algorithm execution</div></article>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel hidden" id="benchmark-panel">
+        <div class="benchmark-layout">
+          <div class="benchmark-controls panel">
+            <div class="section-heading"><span class="section-index">01</span><h2>Benchmark setup</h2></div>
+            <p class="panel-copy">Every algorithm receives the same copy of the selected input array. Timing excludes rendering.</p>
+            <label class="field-label" for="bench-data-mode">INPUT DATA</label>
+            <select id="bench-data-mode" class="input">
+              <option value="random">Random values</option>
+              <option value="sorted">Already sorted</option>
+              <option value="reversed">Reverse order</option>
+              <option value="custom">Custom values</option>
+            </select>
+            <label class="field-label field-spaced" for="bench-array-length">ARRAY LENGTH</label>
+            <div class="input-with-suffix"><input id="bench-array-length" class="input" type="number" min="1" step="1" value="2000"><span>ITEMS</span></div>
+            <div id="bench-custom-wrap" class="custom-wrap hidden">
+              <label class="field-label" for="bench-custom-values">VALUES <span>comma or space separated</span></label>
+              <textarea id="bench-custom-values" class="input custom-values" rows="3" placeholder="8, 3, 6, 1, 9"></textarea>
+            </div>
+            <button id="run-benchmark" class="button button-primary full-width">Run all benchmarks <span>→</span></button>
+            <div id="benchmark-status" class="status-message">Ready to compare all algorithms.</div>
+          </div>
+          <div class="benchmark-results panel">
+            <div class="canvas-header">
+              <div><div class="section-index">RESULTS</div><h2>Performance comparison</h2></div>
+              <div class="canvas-meta" id="benchmark-count">10 ALGORITHMS</div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>ALGORITHM</th><th>TIME</th><th>COMPARISONS</th><th>SWAPS</th><th>WRITES</th><th>COMPLEXITY</th></tr></thead>
+                <tbody id="benchmark-rows"><tr><td colspan="6" class="table-empty">Run a benchmark to see the results.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer><span>SORT LAB</span><span>BUILT FOR EXPLORATION</span></footer>
+  </div>
+</body>
+</html>
+
+
